@@ -1,10 +1,6 @@
-class RolesExtractor:
-    def __init__(self, client):
-        self.client = client
+from core.base_extractor import BaseExtractor
+
+class RolesExtractor(BaseExtractor):
+    SERVICE_NAME="iam"
     def extract(self):
-        all_roles = []
-        paginator = self.client.get_paginator("list_roles")
-        for page in paginator.paginate():
-            roles = page.get("Roles",[])
-            all_roles.extend(roles)
-        return all_roles
+        return self._paginate("list_roles", "Roles")
