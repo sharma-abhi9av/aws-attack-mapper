@@ -6,6 +6,8 @@ from extractors.iam.users        import UsersExtractor
 from extractors.iam.roles        import RolesExtractor
 from extractors.iam.groups       import GroupsExtractor
 from extractors.iam.policies     import PoliciesExtractor
+from exporters.json_writer       import export_to_json
+
 
 def run_extraction(session, out_dir):
     """
@@ -26,7 +28,7 @@ def run_extraction(session, out_dir):
         (UsersExtractor(iam_client),    "users.json"),
         (RolesExtractor(iam_client),    "roles.json"),
         (PoliciesExtractor(iam_client), "policies.json"),
-        (GroupsExtractor(iam_client),  "groups.josn"),
+        (GroupsExtractor(iam_client),  "groups.json"),
     ]
 
     """
@@ -40,8 +42,7 @@ def run_extraction(session, out_dir):
 
         data = extractor.extract()
         filepath = os.path.join(out_dir, filename)
-        # To do create the json writer 
-        print(f"Done, {len(data)} items found -> {filepath}")
+        export_to_json(data, filepath)
 
 def main():
     """

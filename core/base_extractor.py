@@ -1,6 +1,6 @@
 import abc                      # Module for setting up abstract method so every child implement.
 import botocore.exceptions      # Module for AWS API errors
-
+import sys
 class BaseExtractor(abc.ABC):
     """
     Class BaseExtractor, it have an variable specified as SERVICE_NAME, which is an empty string, and get its value by the subclass.
@@ -51,6 +51,9 @@ class BaseExtractor(abc.ABC):
         except botocore.exceptions.ClientError as e:
             code = e.response["Error"]["Code"]
             print(f"API error during: {method}:{code}")
+        except botocore.exceptions.NoCredentialsError:
+            print("No AWS credentials found. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY or use --profile")
+            sys.exit(1)
         return results
 
     def _safe_call(self, method_name, **kwargs):
@@ -66,12 +69,14 @@ class BaseExtractor(abc.ABC):
         - Using **kwargs for any dynamic argument (like UserName="john-doe")
         - If it succeeds, it return the response else raise an Error and return None instead of crashing. 
         """
-        try:
-        
+        try:        
             method = getattr(self.client, method_name)
             return method(**kwargs)
         except botocore.exceptions.ClientError as e:
             Code = e.response["Error"]["Code"]
             print(f"{method_name} failed: {Code}")
             return None
+        except botocore.exceptions.NoCredentialsError:
+            print("No AWS credentials found. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY or use --profile")
+            sys.exit(1)
                 
