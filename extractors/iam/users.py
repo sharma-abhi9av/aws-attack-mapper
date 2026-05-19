@@ -19,8 +19,8 @@ class UsersExtractor(BaseExtractor):
                 resp= self._safe_call("get_user_policy", UserName=username, PolicyName=policy_name)
                 if resp:
                     user["InlinePolicies"].append({
-                        "PolicyName": policy_name
-                        "Document"  : resp["PolicyDocument"]
+                        "PolicyName": policy_name,
+                        "Document": resp["PolicyDocument"]
                     })
             enriched.append(user)
         return enriched
