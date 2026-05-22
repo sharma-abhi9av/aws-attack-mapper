@@ -40,7 +40,7 @@ def run_extraction(session, out_dir):
         data = extractor.extract()
         normalised = normalizer(data)
         filepath = os.path.join(out_dir, filename)
-        export_to_json(data, filepath)
+        export_to_json(normalised, filepath)
 
 def main():
     """
