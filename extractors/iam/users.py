@@ -1,4 +1,3 @@
-import boto3
 from core.base_extractor import BaseExtractor
 
 class UsersExtractor(BaseExtractor):

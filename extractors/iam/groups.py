@@ -1,5 +1,3 @@
-from tokenize import group
-
 from core.base_extractor import BaseExtractor
 
 class GroupsExtractor(BaseExtractor):
