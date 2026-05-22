@@ -7,7 +7,7 @@ from extractors.iam.roles        import RolesExtractor
 from extractors.iam.groups       import GroupsExtractor
 from extractors.iam.policies     import PoliciesExtractor
 from exporters.json_writer       import export_to_json
-
+from parsers.normalizer          import normalize_users, normalize_roles, normalize_groups, normalize_policies
 
 def run_extraction(session, out_dir):
     """
@@ -17,18 +17,16 @@ def run_extraction(session, out_dir):
         sts_client = session.get_client("sts")
     """
     iam_client = session.get_client("iam") 
-    s3_client  = session.get_client("s3")
-    sts_client = session.get_client("sts")
 
     """
     Extraction plan is list of ready to use, extractor object and filename pair.
     Adding new extractor later. we write just one line here.
     """
     extraction_plan = [
-        (UsersExtractor(iam_client),    "users.json"),
-        (RolesExtractor(iam_client),    "roles.json"),
-        (PoliciesExtractor(iam_client), "policies.json"),
-        (GroupsExtractor(iam_client),  "groups.json"),
+    (UsersExtractor(iam_client),    "users.json",    normalize_users),
+    (RolesExtractor(iam_client),    "roles.json",    normalize_roles),
+    (PoliciesExtractor(iam_client), "policies.json", normalize_policies),
+    (GroupsExtractor(iam_client),   "groups.json",   normalize_groups),
     ]
 
     """
@@ -37,10 +35,10 @@ def run_extraction(session, out_dir):
     Save the files in /output directory by default.  
     """
 
-    for extractor, filename in extraction_plan:
+    for extractor, filename, normalizer in extraction_plan:
         print(f"Running {extractor.__class__.__name__}...")
-
         data = extractor.extract()
+        normalised = normalizer(data)
         filepath = os.path.join(out_dir, filename)
         export_to_json(data, filepath)
 
