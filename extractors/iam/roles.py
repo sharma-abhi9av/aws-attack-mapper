@@ -4,15 +4,18 @@ class RolesExtractor(BaseExtractor):
     SERVICE_NAME="iam"
     def extract(self):
         """ 
-        Attached policies: list_attached_role_policies, key AttachedPolicies, kwarg RoleName=rolename
-        Inline names: list_role_policies, key PolicyNames, kwarg RoleName=rolename
-        Each inline doc: get_role_policy with RoleName=rolename, PolicyName=name, document at resp["PolicyDocument"]
+        Extracts all IAM Roles from AWS and enriches each role with:
+        - Managed policies attached to them
+        - Inline policies
         """
         roles= self._paginate("list_roles", "Roles")
         enriched = []
         
         for role in roles:
             rolename = role["RoleName"]
+            # AssumeRolePolicyDocument is already in the role object from list_roles
+            # it shows who can assume this role, making it critical for mapping attack paths
+            # However, we don't need to fetch it separately, it comes free with list_roles
             
             role["AttachedPolicies"] = self._paginate("list_attached_role_policies", "AttachedPolicies", RoleName=rolename)         
             
