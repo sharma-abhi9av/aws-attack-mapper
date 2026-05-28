@@ -11,12 +11,11 @@ class S3BucketsExtractor(BaseExtractor):
             name = bucket["Name"]
 
             # Bucket Policy
-            policy_resp = self._safe_call("get_bucket_policy", Bucket=name)
+            policy_resp = self._safe_call("get_bucket_policy", Bucket=name) # fetches who has permission to access the bucket 
             if policy_resp:
                 bucket["Policy"] = json.loads(policy_resp["Policy"]) # AWS returns the policy as a string so we convert it into a dict for easier use later on.
             else:
                 bucket["Policy"] = None
-
 
             block_resp = self._safe_call("get_public_access_block", Bucket=name)
             if block_resp:

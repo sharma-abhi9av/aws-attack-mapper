@@ -89,7 +89,7 @@ def normalize_buckets(buckets: list) -> list:
             "name":    bucket["Name"],
             "type":    "S3Bucket",
             "service": "s3",
-            "region":  bucket.get("Region", "us-east-1"),
+            "region":  bucket.get("Region") or "us-east-1",
             "public_access_block": bucket.get("PublicAccessBlock", None),
             "relationships": {
                 "has_policy": bucket.get("Policy", None)
