@@ -79,3 +79,20 @@ def normalize_policies(policies: list) -> list:
             "relationships":{}
         })
     return normalised   
+
+def normalize_buckets(buckets: list) -> list:
+    normalised = []
+    for bucket in buckets:
+        normalised.append({
+            "id":      bucket["Name"],     # S3 buckets have no ID — name is unique
+            "arn":     f"arn:aws:s3:::{bucket['Name']}",   # S3 ARN format
+            "name":    bucket["Name"],
+            "type":    "S3Bucket",
+            "service": "s3",
+            "region":  bucket.get("Region", "us-east-1"),
+            "public_access_block": bucket.get("PublicAccessBlock", None),
+            "relationships": {
+                "has_policy": bucket.get("Policy", None)
+            }
+        })
+    return normalised
