@@ -5,8 +5,8 @@ class S3BucketsExtractor(BaseExtractor):
     SERVICE_NAME = "s3"
 
     def extract(self):
-        resp = self._safe_call("list_buckets")
-        buckets = resp["Buckets"] if resp else []
+        resp = self._safe_call("list_buckets")    # Return a dict with list of all bucket in the account,
+        buckets = resp["Buckets"] if resp else [] # List of dicts.
         for bucket in buckets:
             name = bucket["Name"]
 
