@@ -16,7 +16,6 @@ class EC2Extractor(BaseExtractor):
         
         enriched = []
         for instance in instances:
-            instance_id = instance["InstanceId"]
             # Appending results we care about 
             enriched.append({
             "InstanceId":        instance["InstanceId"],
@@ -27,5 +26,8 @@ class EC2Extractor(BaseExtractor):
             "KeyName":           instance.get("KeyName", None),
             "IamInstanceProfile": instance.get("IamInstanceProfile", None),
             "SecurityGroups":    instance.get("SecurityGroups", []),
+            "Tags":     instance.get("Tags", []),
+            "VpcId":    instance.get("VpcId", None),
+            "MetadataOptions": instance.get("MetadataOptions", None),
             })
         return enriched
