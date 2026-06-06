@@ -96,3 +96,30 @@ def normalize_buckets(buckets: list) -> list:
             }
         })
     return normalised
+
+def normalize_ec2(instances: list) -> list:
+    normalised = []
+    for instance in instances:
+        name = next(
+            (tag["Value"] for tag in instance.get("Tags", []) if tag["Key"] == "Name"),
+            instance["InstanceId"]  # fallback to ID if no Name tag
+        )
+        normalised.append({
+            "id":      instance["InstanceId"],
+            "arn":     None,   # EC2 instances don't have ARNs in describe_instances
+            "name":    name,
+            "type":    "EC2Instance",
+            "service": "ec2",
+            "relationships": {
+                "has_role": instance.get("IamInstanceProfile", {}).get("Arn") if instance.get("IamInstanceProfile") else None,
+                "security_groups": [sg["GroupId"] for sg in instance.get("SecurityGroups", [])],
+            },
+            "state":           instance["State"],
+            "public_ip":       instance.get("PublicIpAddress"),
+            "private_ip":      instance.get("PrivateIpAddress"),
+            "instance_type":   instance.get("InstanceType"),
+            "key_name":        instance.get("KeyName"),
+            "vpc_id":          instance.get("VpcId"),
+            "imdsv2_required": instance.get("MetadataOptions", {}).get("HttpTokens") == "required",
+        })
+    return normalised
