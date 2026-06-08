@@ -1,15 +1,16 @@
 import os 
 import argparse     # Module for passing arguments such as, python3 main.py --help
 # Importing out modules 
-from core.aws_session            import AWSSession
-from extractors.iam.users        import UsersExtractor
-from extractors.iam.roles        import RolesExtractor
-from extractors.iam.groups       import GroupsExtractor
-from extractors.iam.policies     import PoliciesExtractor
-from extractors.s3.buckets       import S3BucketsExtractor
-from extractors.ec2.instances    import EC2Extractor
-from exporters.json_writer       import export_to_json
-from parsers.normalizer          import normalize_users, normalize_roles, normalize_groups, normalize_policies, normalize_buckets, normalize_ec2
+from core.aws_session               import AWSSession
+from extractors.iam.users           import UsersExtractor
+from extractors.iam.roles           import RolesExtractor
+from extractors.iam.groups          import GroupsExtractor
+from extractors.iam.policies        import PoliciesExtractor
+from extractors.s3.buckets          import S3BucketsExtractor
+from extractors.ec2.instances       import EC2Extractor
+from extractors.ec2.security_groups import SecurityGroupExtractor
+from exporters.json_writer          import export_to_json
+from parsers.normalizer             import normalize_users, normalize_roles, normalize_groups, normalize_policies, normalize_buckets, normalize_ec2, normalize_security_groups
 
 def run_extraction(session, out_dir):
     """
@@ -33,6 +34,7 @@ def run_extraction(session, out_dir):
     (GroupsExtractor(iam_client),   "groups.json",      normalize_groups),
     (S3BucketsExtractor(s3_client), "s3_buckets.json",  normalize_buckets),
     (EC2Extractor(ec2_client), "ec2_instances.json", normalize_ec2),
+    (SecurityGroupExtractor(ec2_client), "security_groups.json", normalize_security_groups)
     ]
 
     """
