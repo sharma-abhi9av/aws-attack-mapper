@@ -70,6 +70,7 @@ def main():
         region_name=args.region,
         endpoint_url=args.endpoint_url,
     )
+    session.get_caller_identity()
     # Run extraction
     run_extraction(session, args.out_dir)
     print("\nExtraction Complete")

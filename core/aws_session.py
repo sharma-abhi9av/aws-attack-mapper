@@ -32,3 +32,13 @@ class AWSSession:
         if self._endpoint_url:
             kwargs["endpoint_url"] = self._endpoint_url
         return self._session.client(service, **kwargs)
+    def get_caller_identity(self):
+        try:
+            sts = self.get_client("sts")
+            resp = sts.get_caller_identity()
+            print(f"\n[*] Running as: {resp['Arn']}")
+            print(f"[*] Account ID: {resp['Account']}\n")
+            return resp
+        except Exception as e:
+            print(f"Couldn't determine caller identity: {e}")
+            return None 
