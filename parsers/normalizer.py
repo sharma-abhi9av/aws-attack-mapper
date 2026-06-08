@@ -123,3 +123,22 @@ def normalize_ec2(instances: list) -> list:
             "imdsv2_required": instance.get("MetadataOptions", {}).get("HttpTokens") == "required",
         })
     return normalised
+
+def normalize_security_groups(security_groups: list) -> list:
+    normalised = []
+    for sg in security_groups:
+        normalised.append({
+            "id":      sg["GroupId"],
+            "arn":     None,
+            "name":    sg["GroupName"],
+            "type":    "SecurityGroup",
+            "service": "ec2",
+            "vpc_id":  sg.get("VpcId", None),
+            "description": sg.get("Description", ""),
+            "has_public_inbound": sg.get("HasPublicInbound", False),
+            "relationships": {
+                "inbound_rules":  sg.get("InboundRules", []),
+                "outbound_rules": sg.get("OutboundRules", []),
+            }
+        })
+    return normalised
