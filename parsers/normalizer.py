@@ -120,7 +120,7 @@ def normalize_ec2(instances: list) -> list:
             "instance_type":   instance.get("InstanceType"),
             "key_name":        instance.get("KeyName"),
             "vpc_id":          instance.get("VpcId"),
-            "imdsv2_required": instance.get("MetadataOptions", {}).get("HttpTokens") == "required",
+            "imdsv2_required": (instance.get("MetadataOptions") or {}).get("HttpTokens") == "required",
         })
     return normalised
 

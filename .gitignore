@@ -6,3 +6,4 @@ output/
 .env
 __init__.py
 setup_lab.py
+api/mooaws-api

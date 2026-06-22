@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MooAWS</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="shell">
+
+  <!-- Floating Search & Actions (top-left) -->
+  <div class="search-wrap">
+    <i class="fas fa-search"></i>
+    <input id="search" type="text" placeholder="Search by name, ID, or ARN..." spellcheck="false">
+    <div id="search-results" class="search-dd hidden"></div>
+    <div class="sr-actions">
+      <button id="btn-stats" class="sr-btn" title="Database stats"><i class="fas fa-chart-simple"></i></button>
+      <div id="stats-drop" class="stats-dd hidden"></div>
+    </div>
+    <div class="sr-end">
+      <input type="file" id="file-input" accept=".zip,.json" multiple class="hidden">
+      <button id="btn-ingest" class="sr-btn" title="Upload and ingest data"><i class="fas fa-cloud-arrow-down"></i></button>
+    </div>
+  </div>
+
+  <!-- Floating Actions (top-right) -->
+  <div class="top-actions">
+    <button id="btn-hv" class="hv-btn hidden" title="High-value targets"><i class="fas fa-biohazard"></i> <span id="hv-count">0</span></button>
+  </div>
+
+  <!-- Graph Canvas -->
+  <main id="canvas">
+    <div id="cy"></div>
+
+    <!-- Legend -->
+    <div id="legend" class="legend">
+      <div class="legend-item"><span class="legend-icon" style="background-image:url(icons/User.svg)"></span> User</div>
+      <div class="legend-item"><span class="legend-icon" style="background-image:url(icons/Role.svg)"></span> Role</div>
+      <div class="legend-item"><span class="legend-icon" style="background-image:url(icons/Group.svg)"></span> Group</div>
+      <div class="legend-item"><span class="legend-icon" style="background-image:url(icons/Policy.svg)"></span> Policy</div>
+      <div class="legend-item"><span class="legend-icon" style="background-image:url(icons/S3.svg)"></span> S3</div>
+      <div class="legend-item"><span class="legend-icon" style="background-image:url(icons/EC2.svg)"></span> EC2</div>
+      <div class="legend-item"><span class="legend-icon" style="background-image:url(icons/SecurityGroup.svg)"></span> Security Group</div>
+    </div>
+
+    <div id="path-bar" class="path-bar hidden">
+      <div class="pb-section">
+        <span class="pb-label">PATH</span>
+        <span id="path-source" class="pb-node">—</span>
+        <span class="pb-arrow"><i class="fas fa-arrow-right"></i></span>
+        <span id="path-target" class="pb-node">—</span>
+        <button id="btn-find-path" class="pb-btn"><i class="fas fa-route"></i> Find Path</button>
+        <span id="path-msg" class="pb-msg hidden"></span>
+      </div>
+      <button id="btn-clear-path" class="pb-btn-ghost" title="Clear path"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="canvas-tools">
+      <button id="btn-relayout" title="Re-layout graph"><i class="fas fa-arrows-rotate"></i></button>
+      <button onclick="if(cy)cy.fit(undefined,60)" title="Fit to screen"><i class="fas fa-expand"></i></button>
+      <button onclick="if(cy)cy.reset()" title="Reset view"><i class="fas fa-home"></i></button>
+    </div>
+  </main>
+
+  <!-- Detail Panel (right side, shorter with rounded corners) -->
+  <aside id="detail" class="detail hidden">
+    <div class="d-head">
+      <button id="btn-close-detail"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="d-body">
+      <div class="d-top">
+        <h2 id="d-title"></h2>
+        <span id="d-type" class="d-type"></span>
+        <span class="d-arn" id="d-arn"></span>
+      </div>
+
+      <div id="d-content"></div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- Context Menu -->
+<div id="ctx-menu" class="ctx-menu hidden">
+  <div class="ctx-item" data-act="focus"><i class="fas fa-crosshairs"></i> Focus</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item" data-act="neighbors"><i class="fas fa-sitemap"></i> Expand</div>
+  <div class="ctx-item" data-act="reachable"><i class="fas fa-arrow-trend-up"></i> Show Reachable</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item" data-act="setsrc"><i class="fas fa-flag"></i> Set as Source</div>
+  <div class="ctx-item" data-act="settgt"><i class="fas fa-bullseye"></i> Set as Target</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item" data-act="highvalue"><i class="fas fa-biohazard"></i> Mark High Value</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item" data-act="copy-name"><i class="fas fa-copy"></i> Copy Name</div>
+  <div class="ctx-item" data-act="copy-id"><i class="fas fa-copy"></i> Copy ID</div>
+</div>
+
+<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre/cytoscape-dagre.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
