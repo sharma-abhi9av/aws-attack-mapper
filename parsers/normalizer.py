@@ -98,6 +98,9 @@ def normalize_buckets(buckets: list) -> list:
             "public_access_block": bucket.get("PublicAccessBlock", None),
             "relationships": {
                 "has_policy": bucket.get("Policy", None)
+                "is_public": bucket.get("Policy") is not None and 
+                    any(s.get("Principal") == "*" 
+                        for s in bucket.get("Policy", {}).get("Statement", []))
             }
         })
     return normalised
