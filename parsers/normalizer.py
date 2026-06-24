@@ -47,6 +47,11 @@ def normalize_roles(roles: list) -> list:
                 "has_policy": [policy["PolicyArn"] for policy in role["AttachedPolicies"]],
                 "has_inline_policy": [{"name": p["PolicyName"], "document": p["Document"]} for p in role["InlinePolicies"]],
                 "trusts": role["AssumeRolePolicyDocument"]["Statement"]
+                "can_be_assumed_by": [
+                    s.get("Principal", {})
+                    for s in role.get("AssumeRolePolicyDocument", {}).get("Statement", [])
+                    if s.get("Effect") == "Allow"
+                    ]
             }
         })
     return normalised
