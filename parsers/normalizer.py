@@ -1,5 +1,5 @@
 """
-Transforms raw AWS extractor output into a standardised formatfor Neo4j ingestion.
+Transforms raw AWS extractor output into a standardised format for Neo4j ingestion.
 
 Standard format for every entity:
     {
@@ -46,7 +46,7 @@ def normalize_roles(roles: list) -> list:
             "relationships":{
                 "has_policy": [policy["PolicyArn"] for policy in role["AttachedPolicies"]],
                 "has_inline_policy": [{"name": p["PolicyName"], "document": p["Document"]} for p in role["InlinePolicies"]],
-                "trusts": role["AssumeRolePolicyDocument"]["Statement"]
+                "trusts": role["AssumeRolePolicyDocument"]["Statement"],
                 "can_be_assumed_by": [
                     s.get("Principal", {})
                     for s in role.get("AssumeRolePolicyDocument", {}).get("Statement", [])
@@ -89,18 +89,18 @@ def normalize_buckets(buckets: list) -> list:
     normalised = []
     for bucket in buckets:
         normalised.append({
-            "id":      bucket["Name"],     # S3 buckets have no ID — name is unique
+            "id":      bucket["Name"],     # S3 buckets have no ID, name is unique
             "arn":     f"arn:aws:s3:::{bucket['Name']}",   # S3 ARN format
             "name":    bucket["Name"],
             "type":    "S3Bucket",
             "service": "s3",
             "region":  bucket.get("Region") or "us-east-1",
             "public_access_block": bucket.get("PublicAccessBlock", None),
+            "is_public": bucket.get("Policy") is not None and 
+             any(s.get("Principal") == "*" 
+                 for s in bucket.get("Policy", {}).get("Statement", [])),
             "relationships": {
                 "has_policy": bucket.get("Policy", None)
-                "is_public": bucket.get("Policy") is not None and 
-                    any(s.get("Principal") == "*" 
-                        for s in bucket.get("Policy", {}).get("Statement", []))
             }
         })
     return normalised
@@ -148,5 +148,28 @@ def normalize_security_groups(security_groups: list) -> list:
                 "inbound_rules":  sg.get("InboundRules", []),
                 "outbound_rules": sg.get("OutboundRules", []),
             }
+        })
+    return normalised
+def normalize_lambda_functions(functions: list) -> list:
+    normalised = []
+    for function in functions:
+        normalised.append({
+            "id":      function["FunctionArn"],   # ARN is unique, use as ID
+            "arn":     function["FunctionArn"],
+            "name":    function["FunctionName"],
+            "type":    "LambdaFunction",
+            "service": "lambda",
+            "runtime": function.get("Runtime"),
+            "state":   function.get("State"),
+            "description": function.get("Description"),
+            "public_url": function.get("FunctionUrl"),
+            "url_auth_type": function.get("UrlAuthType"),
+            "has_public_url": function.get("UrlAuthType") == "NONE",  # true = dangerous
+            "environment_variables": function.get("Environment", {}),
+            "vpc_id":  function.get("VpcId"),
+            "relationships": {
+                "has_role":       function.get("Role"),
+                "security_groups": function.get("SecurityGroups", []),
+            }            
         })
     return normalised

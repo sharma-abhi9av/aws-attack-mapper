@@ -12,6 +12,7 @@ from extractors.iam.policies import PoliciesExtractor
 from extractors.iam.roles import RolesExtractor
 from extractors.iam.users import UsersExtractor
 from extractors.s3.buckets import S3BucketsExtractor
+from extractors.lambdafunc.functions import LambdaFunctionsExtractor
 from parsers.normalizer import (
     normalize_buckets,
     normalize_ec2,
@@ -20,6 +21,7 @@ from parsers.normalizer import (
     normalize_roles,
     normalize_security_groups,
     normalize_users,
+    normalize_lambda_functions,
 )
 
 
@@ -33,7 +35,7 @@ def run_extraction(session, out_dir):
     iam_client = session.get_client("iam")
     s3_client = session.get_client("s3")
     ec2_client = session.get_client("ec2")
-
+    lambda_client = session.get_client("lambda")
     """
     Extraction plan is list of ready to use, extractor object and filename pair.
     Adding new extractor later. we write just one line here.
@@ -50,6 +52,7 @@ def run_extraction(session, out_dir):
             "security_groups.json",
             normalize_security_groups,
         ),
+        (LambdaFunctionsExtractor(lambda_client), "lambdafunc.json", normalize_lambda_functions)
     ]
 
     """
